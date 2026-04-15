@@ -5,9 +5,9 @@ import type { User } from "@supabase/supabase-js";
 const ADMIN_EMAIL = "admin@profitfit.com";
 
 interface Profile {
-  country: string;
-  phone: string;
-  pin: string;
+  country: string | null;
+  phone: string | null;
+  pin: string | null;
 }
 
 interface AuthContextType {
@@ -43,8 +43,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const u = session?.user ?? null;
       setUser(u);
       if (u) {
-        await fetchProfile(u.id);
-        await checkAdmin(u.id);
+        setTimeout(() => {
+          fetchProfile(u.id);
+          checkAdmin(u.id);
+        }, 0);
       } else {
         setProfile(null);
         setIsAdmin(false);
@@ -77,7 +79,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       options: { data: { country, phone, pin } },
     });
     if (error) throw error;
-    // Profile is created via trigger, but update extra fields
     if (data.user) {
       await supabase.from("profiles").update({ country, phone, pin }).eq("id", data.user.id);
     }
