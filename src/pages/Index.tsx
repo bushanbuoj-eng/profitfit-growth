@@ -50,7 +50,7 @@ function DemoSection() {
 
   const handleGenerate = () => {
     if (!idea.trim()) return;
-    setResult(generateContent(idea, language));
+    setResult(generateContent(idea, language, "instagram"));
   };
 
   return (
