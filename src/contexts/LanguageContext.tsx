@@ -76,6 +76,7 @@ const translations: Record<string, Record<Language, string>> = {
 
   // Dashboard
   "dashboard.title": { en: "Content Generator", ar: "مولّد المحتوى" },
+  "dashboard.platform": { en: "Choose Platform", ar: "اختر المنصة" },
   "dashboard.input": { en: "Enter your content idea", ar: "أدخل فكرة المحتوى الخاص بك" },
   "dashboard.generate": { en: "Generate", ar: "توليد" },
   "dashboard.results": { en: "Your Generated Content", ar: "المحتوى المُنتج" },
