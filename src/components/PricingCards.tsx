@@ -126,7 +126,7 @@ export function PricingCards({ showAction = true }: PricingCardsProps) {
               </div>
             )}
             {isCurrentTier && (
-              <div className="absolute -top-3 right-4 rounded-full bg-green-500 px-3 py-1 text-xs font-bold text-white">
+              <div className="absolute -top-3 right-4 rounded-full bg-accent px-3 py-1 text-xs font-bold text-accent-foreground">
                 {language === "ar" ? "الحالي" : "CURRENT"}
               </div>
             )}
