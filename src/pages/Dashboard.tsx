@@ -1,8 +1,13 @@
 import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { useSubscription, useWhatsAppNumber } from "@/hooks/useSubscription";
+import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { generateContent, getAllPlatforms, getPlatformLabel, Platform } from "@/lib/contentTemplates";
-import { Sparkles, Copy, Check } from "lucide-react";
+import { PricingCards } from "@/components/PricingCards";
+import { Sparkles, Copy, Check, Crown, Zap, AlertTriangle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const platformIcons: Record<Platform, string> = {
@@ -15,14 +20,33 @@ const platformIcons: Record<Platform, string> = {
 
 const Dashboard = () => {
   const { t, language } = useLanguage();
+  const { user } = useAuth();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const { tier, dailyLimit, remaining, canGenerate } = useSubscription();
   const [idea, setIdea] = useState("");
   const [platform, setPlatform] = useState<Platform>("instagram");
   const [result, setResult] = useState<ReturnType<typeof generateContent> | null>(null);
   const [copiedField, setCopiedField] = useState<string | null>(null);
+  const [showPricing, setShowPricing] = useState(false);
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     if (!idea.trim()) return;
+    if (!canGenerate) {
+      setShowPricing(true);
+      return;
+    }
+
+    // Log the generation
+    if (user) {
+      await supabase.from("generation_logs").insert({
+        user_id: user.id,
+        platform,
+        idea: idea.trim(),
+      });
+      queryClient.invalidateQueries({ queryKey: ["generation-count-today"] });
+    }
+
     setResult(generateContent(idea, language, platform));
   };
 
@@ -42,15 +66,49 @@ const Dashboard = () => {
       ]
     : [];
 
+  const tierLabel = tier === "elite" ? (language === "ar" ? "النخبة" : "Elite") : tier === "pro" ? (language === "ar" ? "المحترف" : "Pro") : (language === "ar" ? "مجاني" : "Free");
+  const TierIcon = tier === "free" ? Zap : Crown;
+
   return (
     <div className="container mx-auto max-w-4xl px-4 py-10">
-      <h1 className="mb-8 text-3xl font-bold gold-text-gradient">{t("dashboard.title")}</h1>
+      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="text-3xl font-bold gold-text-gradient">{t("dashboard.title")}</h1>
+        <div className="flex items-center gap-3">
+          <div className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium ${
+            tier === "elite" ? "bg-primary/20 text-primary" : tier === "pro" ? "bg-primary/15 text-primary" : "bg-secondary text-muted-foreground"
+          }`}>
+            <TierIcon className="h-4 w-4" />
+            {tierLabel}
+          </div>
+          <div className="text-sm text-muted-foreground">
+            {tier === "elite"
+              ? (language === "ar" ? "غير محدود" : "Unlimited")
+              : `${remaining}/${dailyLimit} ${language === "ar" ? "متبقي اليوم" : "remaining today"}`}
+          </div>
+        </div>
+      </div>
+
+      {/* Low usage warning */}
+      {!canGenerate && (
+        <div className="mb-6 flex items-center gap-3 rounded-lg border border-primary/30 bg-primary/5 p-4">
+          <AlertTriangle className="h-5 w-5 text-primary shrink-0" />
+          <div className="flex-1">
+            <p className="text-sm font-medium text-foreground">
+              {language === "ar" ? "لقد وصلت إلى الحد اليومي" : "You've reached your daily limit"}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {language === "ar" ? "قم بالترقية لمزيد من التوليدات" : "Upgrade your plan for more generates"}
+            </p>
+          </div>
+          <Button size="sm" className="gold-gradient text-primary-foreground" onClick={() => setShowPricing(true)}>
+            {language === "ar" ? "ترقية" : "Upgrade"}
+          </Button>
+        </div>
+      )}
 
       {/* Platform selector */}
       <div className="mb-6">
-        <label className="mb-2 block text-sm font-semibold text-foreground">
-          {t("dashboard.platform")}
-        </label>
+        <label className="mb-2 block text-sm font-semibold text-foreground">{t("dashboard.platform")}</label>
         <div className="flex flex-wrap gap-2">
           {getAllPlatforms().map((p) => (
             <button
@@ -77,7 +135,11 @@ const Dashboard = () => {
           onChange={(e) => setIdea(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleGenerate()}
         />
-        <Button className="gold-gradient text-primary-foreground font-semibold px-8" onClick={handleGenerate}>
+        <Button
+          className="gold-gradient text-primary-foreground font-semibold px-8"
+          onClick={handleGenerate}
+          disabled={!canGenerate && !idea.trim()}
+        >
           <Sparkles className="mr-2 h-4 w-4" /> {t("dashboard.generate")}
         </Button>
       </div>
@@ -92,10 +154,7 @@ const Dashboard = () => {
               <div key={s.key} className="rounded-lg border border-border bg-card p-5 gold-glow relative group">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="text-sm font-semibold text-primary">{s.label}</h3>
-                  <button
-                    onClick={() => handleCopy(s.content, s.key)}
-                    className="text-muted-foreground hover:text-primary transition-colors"
-                  >
+                  <button onClick={() => handleCopy(s.content, s.key)} className="text-muted-foreground hover:text-primary transition-colors">
                     {copiedField === s.key ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                   </button>
                 </div>
@@ -104,6 +163,25 @@ const Dashboard = () => {
             ))}
           </div>
         </>
+      )}
+
+      {/* Pricing Section */}
+      {showPricing && (
+        <div className="mt-10">
+          <h2 className="mb-6 text-2xl font-bold text-center gold-text-gradient">
+            {language === "ar" ? "اختر خطتك" : "Choose Your Plan"}
+          </h2>
+          <PricingCards />
+        </div>
+      )}
+
+      {/* Always show upgrade button for free users */}
+      {tier === "free" && !showPricing && (
+        <div className="mt-10 text-center">
+          <Button variant="outline" className="border-primary text-primary hover:bg-primary/10" onClick={() => setShowPricing(true)}>
+            <Crown className="mr-2 h-4 w-4" /> {language === "ar" ? "عرض الخطط" : "View Plans"}
+          </Button>
+        </div>
       )}
     </div>
   );

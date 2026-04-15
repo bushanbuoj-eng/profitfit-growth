@@ -1,9 +1,10 @@
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { Sparkles, TrendingUp, Users, Zap, Star, ChevronRight } from "lucide-react";
+import { Sparkles, Star, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { generateContent } from "@/lib/contentTemplates";
+import { PricingCards } from "@/components/PricingCards";
 
 const Index = () => {
   const { t, language } = useLanguage();
@@ -18,9 +19,7 @@ const Index = () => {
           <h1 className="mb-6 text-4xl font-bold leading-tight md:text-6xl">
             <span className="gold-text-gradient">{t("hero.title")}</span>
           </h1>
-          <p className="mx-auto mb-8 max-w-2xl text-lg text-muted-foreground md:text-xl">
-            {t("hero.subtitle")}
-          </p>
+          <p className="mx-auto mb-8 max-w-2xl text-lg text-muted-foreground md:text-xl">{t("hero.subtitle")}</p>
           <Button
             size="lg"
             className="gold-gradient text-primary-foreground text-lg px-10 py-6 font-semibold shadow-lg hover:opacity-90 transition-opacity"
@@ -31,13 +30,16 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Demo */}
       <DemoSection />
 
       {/* Pricing */}
-      <PricingSection />
+      <section className="border-t border-border px-4 py-20">
+        <div className="container mx-auto max-w-5xl">
+          <h2 className="mb-12 text-center text-3xl font-bold gold-text-gradient md:text-4xl">{t("pricing.title")}</h2>
+          <PricingCards />
+        </div>
+      </section>
 
-      {/* Testimonials */}
       <TestimonialsSection />
     </div>
   );
@@ -58,7 +60,6 @@ function DemoSection() {
       <div className="container mx-auto max-w-4xl">
         <h2 className="mb-4 text-center text-3xl font-bold gold-text-gradient md:text-4xl">{t("demo.title")}</h2>
         <p className="mb-10 text-center text-muted-foreground">{t("demo.desc")}</p>
-
         <div className="mb-8 flex flex-col gap-3 sm:flex-row">
           <input
             className="flex-1 rounded-lg border border-border bg-secondary px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
@@ -71,7 +72,6 @@ function DemoSection() {
             <Sparkles className="mr-2 h-4 w-4" /> {t("demo.generate")}
           </Button>
         </div>
-
         {result && (
           <div className="grid gap-4 md:grid-cols-2 animate-fade-in">
             {[
@@ -87,74 +87,6 @@ function DemoSection() {
             ))}
           </div>
         )}
-      </div>
-    </section>
-  );
-}
-
-function PricingSection() {
-  const { t, language } = useLanguage();
-
-  const plans = [
-    {
-      name: t("pricing.starter"),
-      price: "$19",
-      features: language === "en"
-        ? ["50 content generates/month", "English & Arabic", "Supplements access"]
-        : ["50 توليد محتوى/شهرياً", "الإنجليزية والعربية", "الوصول للمكملات"],
-    },
-    {
-      name: t("pricing.pro"),
-      price: "$49",
-      popular: true,
-      features: language === "en"
-        ? ["200 content generates/month", "English & Arabic", "Supplements access", "Priority support"]
-        : ["200 توليد محتوى/شهرياً", "الإنجليزية والعربية", "الوصول للمكملات", "دعم أولوي"],
-    },
-    {
-      name: t("pricing.elite"),
-      price: "$99",
-      features: language === "en"
-        ? ["Unlimited generates", "English & Arabic", "Supplements access", "Priority support", "Custom templates"]
-        : ["توليد غير محدود", "الإنجليزية والعربية", "الوصول للمكملات", "دعم أولوي", "قوالب مخصصة"],
-    },
-  ];
-
-  return (
-    <section className="border-t border-border px-4 py-20">
-      <div className="container mx-auto max-w-5xl">
-        <h2 className="mb-12 text-center text-3xl font-bold gold-text-gradient md:text-4xl">{t("pricing.title")}</h2>
-        <div className="grid gap-6 md:grid-cols-3">
-          {plans.map((plan) => (
-            <div
-              key={plan.name}
-              className={`relative rounded-xl border p-6 transition-all hover:gold-glow ${
-                plan.popular ? "border-primary gold-glow" : "border-border"
-              }`}
-            >
-              {plan.popular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full gold-gradient px-4 py-1 text-xs font-bold text-primary-foreground">
-                  {language === "en" ? "MOST POPULAR" : "الأكثر شعبية"}
-                </div>
-              )}
-              <h3 className="mb-2 text-xl font-bold text-foreground">{plan.name}</h3>
-              <div className="mb-6">
-                <span className="text-4xl font-bold gold-text-gradient">{plan.price}</span>
-                <span className="text-muted-foreground">{t("pricing.month")}</span>
-              </div>
-              <ul className="mb-6 space-y-3">
-                {plan.features.map((f) => (
-                  <li key={f} className="flex items-center gap-2 text-sm text-foreground/80">
-                    <Star className="h-4 w-4 text-primary" /> {f}
-                  </li>
-                ))}
-              </ul>
-              <Button className={`w-full ${plan.popular ? "gold-gradient text-primary-foreground" : "bg-secondary text-foreground hover:bg-secondary/80"}`}>
-                {t("pricing.cta")}
-              </Button>
-            </div>
-          ))}
-        </div>
       </div>
     </section>
   );
