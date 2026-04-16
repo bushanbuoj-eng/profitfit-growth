@@ -9,7 +9,11 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
   },
   preview: {
-    allowedHosts: ["profitfit-growth.onrender.com"],
+    allowedHosts: [
+      "profitfit-growth.onrender.com",
+      "profitfit.site",
+      "www.profitfit.site"
+    ],
   },
   plugins: [
     react(),
