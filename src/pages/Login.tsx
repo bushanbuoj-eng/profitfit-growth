@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 
 const Login = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { login } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -49,6 +49,11 @@ const Login = () => {
         <p className="mt-4 text-center text-sm text-muted-foreground">
           {t("auth.login.no_account")}{" "}
           <Link to="/signup" className="text-primary hover:underline">{t("nav.signup")}</Link>
+        </p>
+        <p className="mt-2 text-center text-sm">
+          <Link to="/forgot-password" className="text-primary hover:underline">
+            {language === "ar" ? "نسيت كلمة المرور؟" : "Forgot password?"}
+          </Link>
         </p>
       </div>
     </div>
