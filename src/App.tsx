@@ -7,6 +7,7 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { Header } from "@/components/Header";
 import { WhatsAppFab } from "@/components/WhatsAppFab";
+import InstallPWA from "@/components/InstallPWA";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
