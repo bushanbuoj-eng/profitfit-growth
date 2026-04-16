@@ -88,7 +88,7 @@ export function useWhatsAppNumber() {
         .select("value")
         .eq("key", "whatsapp_number")
         .single();
-      return data?.value || "+1234567890";
+      return data?.value || "+254707874790";
     },
   });
 }

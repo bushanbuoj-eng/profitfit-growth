@@ -50,6 +50,11 @@ const Login = () => {
           {t("auth.login.no_account")}{" "}
           <Link to="/signup" className="text-primary hover:underline">{t("nav.signup")}</Link>
         </p>
+        <p className="mt-2 text-center text-sm">
+          <Link to="/forgot-password" className="text-primary hover:underline">
+            {language === "ar" ? "نسيت كلمة المرور؟" : "Forgot password?"}
+          </Link>
+        </p>
       </div>
     </div>
   );

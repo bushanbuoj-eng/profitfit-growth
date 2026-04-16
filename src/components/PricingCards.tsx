@@ -95,7 +95,7 @@ export function PricingCards({ showAction = true }: PricingCardsProps) {
     queryClient.invalidateQueries({ queryKey: ["pending-payment"] });
 
     // Open WhatsApp
-    const phone = (whatsappNumber || "+1234567890").replace(/[^0-9]/g, "");
+    const phone = (whatsappNumber || "+254707874790").replace(/[^0-9]/g, "");
     const message = language === "ar"
       ? `مرحباً، أرغب في الاشتراك في خطة ${planTier === "pro" ? "المحترف" : "النخبة"} بقيمة $${amount}. بريدي الإلكتروني: ${user.email}`
       : `Hi, I'd like to subscribe to the ${planTier === "pro" ? "Pro" : "Elite"} plan for $${amount}. My email: ${user.email}`;
