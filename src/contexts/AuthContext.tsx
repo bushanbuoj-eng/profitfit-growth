@@ -8,6 +8,7 @@ interface Profile {
   country: string | null;
   phone: string | null;
   pin: string | null;
+  verified: boolean;
 }
 
 interface AuthContextType {

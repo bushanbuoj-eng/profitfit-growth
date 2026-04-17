@@ -2,7 +2,8 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { User, Globe, Mail, LogOut } from "lucide-react";
+import { User, Globe, Mail, LogOut, BadgeCheck } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Profile = () => {
   const { t, language } = useLanguage();
