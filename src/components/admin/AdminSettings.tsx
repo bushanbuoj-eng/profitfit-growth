@@ -5,6 +5,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Save, MessageCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -82,18 +83,23 @@ export function AdminSettings() {
           </p>
           <div className="space-y-3">
             <Label>{language === "ar" ? "رقم الهاتف (مع رمز الدولة)" : "Phone Number (with country code)"}</Label>
-            <Input
-              value={whatsapp}
-              onChange={(e) => setWhatsapp(e.target.value)}
-              placeholder="+1234567890"
-              className="bg-secondary"
-              dir="ltr"
-            />
-            <Button className="gold-gradient text-primary-foreground" onClick={handleSave}>
-              <Save className="mr-1 h-4 w-4" /> {language === "ar" ? "حفظ" : "Save"}
-            </Button>
+            <Input value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="+1234567890" className="bg-secondary" dir="ltr" />
           </div>
         </div>
+
+        <div className="rounded-xl border border-border bg-card p-6 space-y-3">
+          <h2 className="text-lg font-semibold text-foreground">{language === "ar" ? "تعليمات الدفع اليدوي" : "Manual Payment Instructions"}</h2>
+          <Label>{language === "ar" ? "تعليمات للعميل" : "Instructions shown to customer"}</Label>
+          <Textarea value={instructions} onChange={(e) => setInstructions(e.target.value)} rows={3} className="bg-secondary" />
+          <Label>{language === "ar" ? "تفاصيل البنك" : "Bank Details"}</Label>
+          <Textarea value={bank} onChange={(e) => setBank(e.target.value)} rows={4} className="bg-secondary font-mono text-xs" dir="ltr" />
+          <Label>{language === "ar" ? "تفاصيل Paybill" : "Paybill / Mobile Money"}</Label>
+          <Textarea value={paybill} onChange={(e) => setPaybill(e.target.value)} rows={3} className="bg-secondary font-mono text-xs" dir="ltr" />
+        </div>
+
+        <Button className="gold-gradient text-primary-foreground w-full" onClick={handleSave}>
+          <Save className="mr-1 h-4 w-4" /> {language === "ar" ? "حفظ كل الإعدادات" : "Save All Settings"}
+        </Button>
       </div>
     </div>
   );
