@@ -2,15 +2,16 @@ import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { Navigate } from "react-router-dom";
-import { LayoutDashboard, Users, Package, CreditCard, MessageCircle, Settings } from "lucide-react";
+import { LayoutDashboard, Users, Package, CreditCard, MessageCircle, Settings, Wallet } from "lucide-react";
 import { AdminDashboard } from "@/components/admin/AdminDashboard";
 import { AdminCustomers } from "@/components/admin/AdminCustomers";
 import { AdminProducts } from "@/components/admin/AdminProducts";
 import { AdminPayments } from "@/components/admin/AdminPayments";
+import { AdminWallets } from "@/components/admin/AdminWallets";
 import { AdminCustomerCare } from "@/components/admin/AdminCustomerCare";
 import { AdminSettings } from "@/components/admin/AdminSettings";
 
-type Tab = "dashboard" | "customers" | "products" | "payments" | "care" | "settings";
+type Tab = "dashboard" | "customers" | "products" | "payments" | "wallets" | "care" | "settings";
 
 const Admin = () => {
   const { t, language } = useLanguage();
@@ -25,6 +26,7 @@ const Admin = () => {
     { key: "customers" as Tab, icon: Users, label: t("admin.customers") },
     { key: "products" as Tab, icon: Package, label: t("admin.products") },
     { key: "payments" as Tab, icon: CreditCard, label: language === "ar" ? "المدفوعات" : "Payments" },
+    { key: "wallets" as Tab, icon: Wallet, label: language === "ar" ? "المحافظ" : "Wallets" },
     { key: "care" as Tab, icon: MessageCircle, label: language === "ar" ? "خدمة العملاء" : "Customer Care" },
     { key: "settings" as Tab, icon: Settings, label: language === "ar" ? "الإعدادات" : "Settings" },
   ];
@@ -52,6 +54,7 @@ const Admin = () => {
         {tab === "customers" && <AdminCustomers />}
         {tab === "products" && <AdminProducts />}
         {tab === "payments" && <AdminPayments />}
+        {tab === "wallets" && <AdminWallets />}
         {tab === "care" && <AdminCustomerCare />}
         {tab === "settings" && <AdminSettings />}
       </main>
