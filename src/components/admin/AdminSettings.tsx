@@ -5,6 +5,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Save, MessageCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -13,6 +14,9 @@ export function AdminSettings() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [whatsapp, setWhatsapp] = useState("");
+  const [instructions, setInstructions] = useState("");
+  const [bank, setBank] = useState("");
+  const [paybill, setPaybill] = useState("");
 
   const { data: settings } = useQuery({
     queryKey: ["admin-settings"],
@@ -25,25 +29,37 @@ export function AdminSettings() {
 
   useEffect(() => {
     if (settings) {
-      const wp = settings.find((s) => s.key === "whatsapp_number");
-      if (wp) setWhatsapp(wp.value);
+      setWhatsapp(settings.find((s) => s.key === "whatsapp_number")?.value ?? "");
+      setInstructions(settings.find((s) => s.key === "manual_payment_instructions")?.value ?? "");
+      setBank(settings.find((s) => s.key === "bank_details")?.value ?? "");
+      setPaybill(settings.find((s) => s.key === "paybill_details")?.value ?? "");
     }
   }, [settings]);
 
-  const handleSave = async () => {
-    const { error } = await supabase
-      .from("admin_settings")
-      .update({ value: whatsapp })
-      .eq("key", "whatsapp_number");
+  const upsertSetting = async (key: string, value: string) => {
+    const { data: existing } = await supabase.from("admin_settings").select("id").eq("key", key).maybeSingle();
+    if (existing) {
+      return supabase.from("admin_settings").update({ value }).eq("key", key);
+    }
+    return supabase.from("admin_settings").insert({ key, value });
+  };
 
-    if (error) {
-      toast({ title: language === "ar" ? "خطأ" : "Error", description: error.message, variant: "destructive" });
+  const handleSave = async () => {
+    const results = await Promise.all([
+      upsertSetting("whatsapp_number", whatsapp),
+      upsertSetting("manual_payment_instructions", instructions),
+      upsertSetting("bank_details", bank),
+      upsertSetting("paybill_details", paybill),
+    ]);
+    const err = results.find((r) => r.error);
+    if (err?.error) {
+      toast({ title: language === "ar" ? "خطأ" : "Error", description: err.error.message, variant: "destructive" });
       return;
     }
-
     queryClient.invalidateQueries({ queryKey: ["admin-settings"] });
     queryClient.invalidateQueries({ queryKey: ["whatsapp-number"] });
-    toast({ title: language === "ar" ? "تم الحفظ" : "Saved", description: language === "ar" ? "تم تحديث الإعدادات بنجاح" : "Settings updated successfully" });
+    queryClient.invalidateQueries({ queryKey: ["payment-settings"] });
+    toast({ title: language === "ar" ? "تم الحفظ" : "Saved" });
   };
 
   return (
@@ -67,18 +83,23 @@ export function AdminSettings() {
           </p>
           <div className="space-y-3">
             <Label>{language === "ar" ? "رقم الهاتف (مع رمز الدولة)" : "Phone Number (with country code)"}</Label>
-            <Input
-              value={whatsapp}
-              onChange={(e) => setWhatsapp(e.target.value)}
-              placeholder="+1234567890"
-              className="bg-secondary"
-              dir="ltr"
-            />
-            <Button className="gold-gradient text-primary-foreground" onClick={handleSave}>
-              <Save className="mr-1 h-4 w-4" /> {language === "ar" ? "حفظ" : "Save"}
-            </Button>
+            <Input value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="+1234567890" className="bg-secondary" dir="ltr" />
           </div>
         </div>
+
+        <div className="rounded-xl border border-border bg-card p-6 space-y-3">
+          <h2 className="text-lg font-semibold text-foreground">{language === "ar" ? "تعليمات الدفع اليدوي" : "Manual Payment Instructions"}</h2>
+          <Label>{language === "ar" ? "تعليمات للعميل" : "Instructions shown to customer"}</Label>
+          <Textarea value={instructions} onChange={(e) => setInstructions(e.target.value)} rows={3} className="bg-secondary" />
+          <Label>{language === "ar" ? "تفاصيل البنك" : "Bank Details"}</Label>
+          <Textarea value={bank} onChange={(e) => setBank(e.target.value)} rows={4} className="bg-secondary font-mono text-xs" dir="ltr" />
+          <Label>{language === "ar" ? "تفاصيل Paybill" : "Paybill / Mobile Money"}</Label>
+          <Textarea value={paybill} onChange={(e) => setPaybill(e.target.value)} rows={3} className="bg-secondary font-mono text-xs" dir="ltr" />
+        </div>
+
+        <Button className="gold-gradient text-primary-foreground w-full" onClick={handleSave}>
+          <Save className="mr-1 h-4 w-4" /> {language === "ar" ? "حفظ كل الإعدادات" : "Save All Settings"}
+        </Button>
       </div>
     </div>
   );

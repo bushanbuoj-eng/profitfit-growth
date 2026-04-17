@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, XCircle } from "lucide-react";
+import { CheckCircle, XCircle, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export function AdminPayments() {
@@ -22,6 +22,11 @@ export function AdminPayments() {
       return data;
     },
   });
+
+  const viewEvidence = async (path: string) => {
+    const { data } = await supabase.storage.from("payment-evidence").createSignedUrl(path, 60 * 5);
+    if (data?.signedUrl) window.open(data.signedUrl, "_blank");
+  };
 
   const handleAction = async (id: string, userId: string, status: "approved" | "rejected", tier?: string) => {
     const { error } = await supabase
@@ -45,6 +50,9 @@ export function AdminPayments() {
         started_at: new Date().toISOString(),
         expires_at: expiresAt.toISOString(),
       });
+
+      // Set verified badge on user profile
+      await supabase.from("profiles").update({ verified: true }).eq("id", userId);
     }
 
     queryClient.invalidateQueries({ queryKey: ["admin-payments"] });
@@ -80,6 +88,8 @@ export function AdminPayments() {
                 <TableHead>{language === "ar" ? "العميل" : "Customer"}</TableHead>
                 <TableHead>{language === "ar" ? "الخطة" : "Plan"}</TableHead>
                 <TableHead>{language === "ar" ? "المبلغ" : "Amount"}</TableHead>
+                <TableHead>{language === "ar" ? "الطريقة" : "Method"}</TableHead>
+                <TableHead>{language === "ar" ? "إثبات" : "Evidence"}</TableHead>
                 <TableHead>{language === "ar" ? "الحالة" : "Status"}</TableHead>
                 <TableHead>{language === "ar" ? "التاريخ" : "Date"}</TableHead>
                 <TableHead>{language === "ar" ? "إجراءات" : "Actions"}</TableHead>
@@ -91,6 +101,14 @@ export function AdminPayments() {
                   <TableCell className="text-foreground">{p.profiles?.email || "—"}</TableCell>
                   <TableCell className="text-foreground capitalize">{p.tier}</TableCell>
                   <TableCell className="text-foreground">${p.amount}</TableCell>
+                  <TableCell className="text-foreground capitalize">{p.method || "manual"}</TableCell>
+                  <TableCell>
+                    {p.evidence_url && (
+                      <Button size="sm" variant="ghost" onClick={() => viewEvidence(p.evidence_url)}>
+                        <FileText className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </TableCell>
                   <TableCell>{statusBadge(p.status)}</TableCell>
                   <TableCell className="text-foreground">{new Date(p.created_at).toLocaleDateString()}</TableCell>
                   <TableCell>

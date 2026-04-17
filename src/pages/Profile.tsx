@@ -2,7 +2,8 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { User, Globe, Mail, LogOut } from "lucide-react";
+import { User, Globe, Mail, LogOut, BadgeCheck } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Profile = () => {
   const { t, language } = useLanguage();
@@ -20,10 +21,18 @@ const Profile = () => {
 
       <div className="rounded-xl border border-border bg-card p-6 gold-glow space-y-6">
         <div className="flex items-center justify-center">
-          <div className="flex h-20 w-20 items-center justify-center rounded-full gold-gradient">
+          <div className="relative flex h-20 w-20 items-center justify-center rounded-full gold-gradient">
             <User className="h-10 w-10 text-primary-foreground" />
+            {profile?.verified && (
+              <BadgeCheck className="absolute -bottom-1 -right-1 h-7 w-7 fill-primary text-primary-foreground" />
+            )}
           </div>
         </div>
+        {profile?.verified && (
+          <p className="text-center text-xs font-semibold text-primary">
+            {language === "ar" ? "✓ حساب موثّق" : "✓ Verified Account"}
+          </p>
+        )}
 
         <div className="space-y-4">
           <div className="flex items-center gap-3 rounded-lg bg-secondary p-4">
@@ -50,6 +59,10 @@ const Profile = () => {
             </div>
           </div>
         </div>
+
+        <Link to="/forgot-password" className="block text-center text-sm text-primary hover:underline">
+          {language === "ar" ? "تغيير كلمة المرور" : "Change Password"}
+        </Link>
 
         <Button variant="destructive" className="w-full" onClick={handleLogout}>
           <LogOut className="mr-2 h-4 w-4" /> {t("profile.logout")}
