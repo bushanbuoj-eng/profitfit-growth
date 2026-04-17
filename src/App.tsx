@@ -5,7 +5,9 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 import { WhatsAppFab } from "@/components/WhatsAppFab";
 import InstallPWA from "@/components/InstallPWA";
 import Index from "./pages/Index";
@@ -14,6 +16,7 @@ import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import Supplements from "./pages/Supplements";
 import Profile from "./pages/Profile";
+import Wallet from "./pages/Wallet";
 import Admin from "./pages/Admin";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
@@ -24,31 +27,39 @@ const queryClient = new QueryClient();
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <LanguageProvider>
-        <AuthProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <Header />
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<Signup />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/supplements" element={<Supplements />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/admin" element={<Admin />} />
-                <Route path="/forgot-password" element={<ForgotPassword />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-              <WhatsAppFab />
-              <InstallPWA />
-            </BrowserRouter>
-          </TooltipProvider>
-        </AuthProvider>
-      </LanguageProvider>
+      <ThemeProvider>
+        <LanguageProvider>
+          <AuthProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <div className="flex min-h-screen flex-col">
+                  <Header />
+                  <div className="flex-1">
+                    <Routes>
+                      <Route path="/" element={<Index />} />
+                      <Route path="/login" element={<Login />} />
+                      <Route path="/signup" element={<Signup />} />
+                      <Route path="/dashboard" element={<Dashboard />} />
+                      <Route path="/supplements" element={<Supplements />} />
+                      <Route path="/profile" element={<Profile />} />
+                      <Route path="/wallet" element={<Wallet />} />
+                      <Route path="/admin" element={<Admin />} />
+                      <Route path="/forgot-password" element={<ForgotPassword />} />
+                      <Route path="/reset-password" element={<ResetPassword />} />
+                      <Route path="*" element={<NotFound />} />
+                    </Routes>
+                  </div>
+                  <Footer />
+                </div>
+                <WhatsAppFab />
+                <InstallPWA />
+              </BrowserRouter>
+            </TooltipProvider>
+          </AuthProvider>
+        </LanguageProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 };
