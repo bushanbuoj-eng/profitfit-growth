@@ -5,8 +5,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Star, Crown, Zap, Check, MessageCircle, Clock } from "lucide-react";
+import { Star, Crown, Zap, Check, CreditCard, Clock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { PaymentDialog } from "@/components/PaymentDialog";
+import { useState } from "react";
 
 interface PricingCardsProps {
   showAction?: boolean;
@@ -20,6 +22,8 @@ export function PricingCards({ showAction = true }: PricingCardsProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const [payOpen, setPayOpen] = useState(false);
+  const [selected, setSelected] = useState<{ tier: Tier; amount: number } | null>(null);
 
   const plans: {
     tier: Tier;
@@ -63,13 +67,9 @@ export function PricingCards({ showAction = true }: PricingCardsProps) {
     },
   ];
 
-  const handleSubscribe = async (planTier: Tier) => {
-    if (!user) {
-      navigate("/signup");
-      return;
-    }
+  const handleSubscribe = (planTier: Tier) => {
+    if (!user) { navigate("/signup"); return; }
     if (planTier === "free") return;
-
     if (pendingPayment) {
       toast({
         title: language === "ar" ? "طلب قائم" : "Pending Request",
@@ -77,35 +77,9 @@ export function PricingCards({ showAction = true }: PricingCardsProps) {
       });
       return;
     }
-
     const amount = planTier === "pro" ? 10 : 25;
-
-    // Create payment request
-    const { error } = await supabase.from("payment_requests").insert({
-      user_id: user.id,
-      tier: planTier,
-      amount,
-    });
-
-    if (error) {
-      toast({ title: t("common.error"), description: error.message, variant: "destructive" });
-      return;
-    }
-
-    queryClient.invalidateQueries({ queryKey: ["pending-payment"] });
-
-    // Open WhatsApp
-    const phone = (whatsappNumber || "+254707874790").replace(/[^0-9]/g, "");
-    const message = language === "ar"
-      ? `مرحباً، أرغب في الاشتراك في خطة ${planTier === "pro" ? "المحترف" : "النخبة"} بقيمة $${amount}. بريدي الإلكتروني: ${user.email}`
-      : `Hi, I'd like to subscribe to the ${planTier === "pro" ? "Pro" : "Elite"} plan for $${amount}. My email: ${user.email}`;
-    
-    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, "_blank");
-
-    toast({
-      title: language === "ar" ? "تم إرسال الطلب" : "Request Sent",
-      description: language === "ar" ? "أكمل الدفع عبر واتساب وسيقوم المسؤول بتفعيل اشتراكك" : "Complete payment via WhatsApp and admin will activate your subscription.",
-    });
+    setSelected({ tier: planTier, amount });
+    setPayOpen(true);
   };
 
   return (
@@ -168,8 +142,8 @@ export function PricingCards({ showAction = true }: PricingCardsProps) {
                     className={`w-full ${plan.popular ? "gold-gradient text-primary-foreground" : "bg-secondary text-foreground hover:bg-secondary/80"}`}
                     onClick={() => handleSubscribe(plan.tier)}
                   >
-                    <MessageCircle className="mr-1 h-4 w-4" />
-                    {language === "ar" ? "اشترك عبر واتساب" : "Subscribe via WhatsApp"}
+                    <CreditCard className="mr-1 h-4 w-4" />
+                    {language === "ar" ? "ادفع الآن" : "Pay Now"}
                   </Button>
                 )}
               </>
@@ -177,6 +151,14 @@ export function PricingCards({ showAction = true }: PricingCardsProps) {
           </div>
         );
       })}
+      {selected && (
+        <PaymentDialog
+          open={payOpen}
+          onOpenChange={setPayOpen}
+          amount={selected.amount}
+          tier={selected.tier}
+        />
+      )}
     </div>
   );
 }
