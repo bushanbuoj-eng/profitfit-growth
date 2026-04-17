@@ -35,6 +35,63 @@ export type Database = {
         }
         Relationships: []
       }
+      announcements: {
+        Row: {
+          active: boolean
+          body: string
+          created_at: string
+          id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          body: string
+          created_at?: string
+          id?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          body?: string
+          created_at?: string
+          id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      chat_messages: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          is_admin: boolean
+          read: boolean
+          recipient_id: string | null
+          sender_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          is_admin?: boolean
+          read?: boolean
+          recipient_id?: string | null
+          sender_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          is_admin?: boolean
+          read?: boolean
+          recipient_id?: string | null
+          sender_id?: string
+        }
+        Relationships: []
+      }
       generation_logs: {
         Row: {
           created_at: string
@@ -64,7 +121,9 @@ export type Database = {
           admin_note: string | null
           amount: number
           created_at: string
+          evidence_url: string | null
           id: string
+          method: string
           status: string
           tier: string
           updated_at: string
@@ -74,7 +133,9 @@ export type Database = {
           admin_note?: string | null
           amount: number
           created_at?: string
+          evidence_url?: string | null
           id?: string
+          method?: string
           status?: string
           tier: string
           updated_at?: string
@@ -84,7 +145,9 @@ export type Database = {
           admin_note?: string | null
           amount?: number
           created_at?: string
+          evidence_url?: string | null
           id?: string
+          method?: string
           status?: string
           tier?: string
           updated_at?: string
@@ -131,6 +194,7 @@ export type Database = {
           phone: string | null
           pin: string | null
           updated_at: string
+          verified: boolean
         }
         Insert: {
           country?: string | null
@@ -140,6 +204,7 @@ export type Database = {
           phone?: string | null
           pin?: string | null
           updated_at?: string
+          verified?: boolean
         }
         Update: {
           country?: string | null
@@ -149,6 +214,49 @@ export type Database = {
           phone?: string | null
           pin?: string | null
           updated_at?: string
+          verified?: boolean
+        }
+        Relationships: []
+      }
+      promotions: {
+        Row: {
+          created_at: string
+          description: string | null
+          expires_at: string | null
+          id: string
+          image_url: string | null
+          price: number
+          published_at: string | null
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          expires_at?: string | null
+          id?: string
+          image_url?: string | null
+          price?: number
+          published_at?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          expires_at?: string | null
+          id?: string
+          image_url?: string | null
+          price?: number
+          published_at?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -199,6 +307,63 @@ export type Database = {
         Update: {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      wallet_balances: {
+        Row: {
+          balance: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          balance?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          balance?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      wallet_transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          evidence_url: string | null
+          id: string
+          method: string | null
+          note: string | null
+          status: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          evidence_url?: string | null
+          id?: string
+          method?: string | null
+          note?: string | null
+          status?: string
+          type?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          evidence_url?: string | null
+          id?: string
+          method?: string | null
+          note?: string | null
+          status?: string
+          type?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
