@@ -30,8 +30,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   const fetchProfile = async (userId: string) => {
-    const { data } = await supabase.from("profiles").select("country, phone, pin").eq("id", userId).single();
-    if (data) setProfile(data);
+    const { data } = await supabase.from("profiles").select("country, phone, pin, verified").eq("id", userId).single();
+    if (data) setProfile(data as Profile);
   };
 
   const checkAdmin = async (userId: string) => {
