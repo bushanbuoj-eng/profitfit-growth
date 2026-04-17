@@ -13,6 +13,9 @@ export function AdminSettings() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [whatsapp, setWhatsapp] = useState("");
+  const [instructions, setInstructions] = useState("");
+  const [bank, setBank] = useState("");
+  const [paybill, setPaybill] = useState("");
 
   const { data: settings } = useQuery({
     queryKey: ["admin-settings"],
@@ -25,25 +28,37 @@ export function AdminSettings() {
 
   useEffect(() => {
     if (settings) {
-      const wp = settings.find((s) => s.key === "whatsapp_number");
-      if (wp) setWhatsapp(wp.value);
+      setWhatsapp(settings.find((s) => s.key === "whatsapp_number")?.value ?? "");
+      setInstructions(settings.find((s) => s.key === "manual_payment_instructions")?.value ?? "");
+      setBank(settings.find((s) => s.key === "bank_details")?.value ?? "");
+      setPaybill(settings.find((s) => s.key === "paybill_details")?.value ?? "");
     }
   }, [settings]);
 
-  const handleSave = async () => {
-    const { error } = await supabase
-      .from("admin_settings")
-      .update({ value: whatsapp })
-      .eq("key", "whatsapp_number");
+  const upsertSetting = async (key: string, value: string) => {
+    const { data: existing } = await supabase.from("admin_settings").select("id").eq("key", key).maybeSingle();
+    if (existing) {
+      return supabase.from("admin_settings").update({ value }).eq("key", key);
+    }
+    return supabase.from("admin_settings").insert({ key, value });
+  };
 
-    if (error) {
-      toast({ title: language === "ar" ? "خطأ" : "Error", description: error.message, variant: "destructive" });
+  const handleSave = async () => {
+    const results = await Promise.all([
+      upsertSetting("whatsapp_number", whatsapp),
+      upsertSetting("manual_payment_instructions", instructions),
+      upsertSetting("bank_details", bank),
+      upsertSetting("paybill_details", paybill),
+    ]);
+    const err = results.find((r) => r.error);
+    if (err?.error) {
+      toast({ title: language === "ar" ? "خطأ" : "Error", description: err.error.message, variant: "destructive" });
       return;
     }
-
     queryClient.invalidateQueries({ queryKey: ["admin-settings"] });
     queryClient.invalidateQueries({ queryKey: ["whatsapp-number"] });
-    toast({ title: language === "ar" ? "تم الحفظ" : "Saved", description: language === "ar" ? "تم تحديث الإعدادات بنجاح" : "Settings updated successfully" });
+    queryClient.invalidateQueries({ queryKey: ["payment-settings"] });
+    toast({ title: language === "ar" ? "تم الحفظ" : "Saved" });
   };
 
   return (
