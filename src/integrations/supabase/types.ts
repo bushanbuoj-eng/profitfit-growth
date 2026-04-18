@@ -116,6 +116,87 @@ export type Database = {
         }
         Relationships: []
       }
+      notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          link: string | null
+          read: boolean
+          title: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          link?: string | null
+          read?: boolean
+          title: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          link?: string | null
+          read?: boolean
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      orders: {
+        Row: {
+          address: string
+          admin_note: string | null
+          created_at: string
+          id: string
+          paid_from_wallet: boolean
+          phone: string | null
+          product_id: string
+          product_name: string
+          quantity: number
+          status: string
+          total: number
+          unit_price: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address: string
+          admin_note?: string | null
+          created_at?: string
+          id?: string
+          paid_from_wallet?: boolean
+          phone?: string | null
+          product_id: string
+          product_name: string
+          quantity?: number
+          status?: string
+          total: number
+          unit_price: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string
+          admin_note?: string | null
+          created_at?: string
+          id?: string
+          paid_from_wallet?: boolean
+          phone?: string | null
+          product_id?: string
+          product_name?: string
+          quantity?: number
+          status?: string
+          total?: number
+          unit_price?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       payment_requests: {
         Row: {
           admin_note: string | null
