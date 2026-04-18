@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Menu, X, Wallet } from "lucide-react";
 import { useState } from "react";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { NotificationBell } from "@/components/NotificationBell";
 
 export function Header() {
   const { language, setLanguage, t } = useLanguage();
@@ -20,6 +21,7 @@ export function Header() {
         </Link>
 
         <div className="flex items-center gap-2">
+          {user && <NotificationBell />}
           <ThemeToggle />
           <button
             onClick={() => setLanguage(language === "en" ? "ar" : "en")}

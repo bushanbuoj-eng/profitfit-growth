@@ -1,10 +1,20 @@
+import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
-import { ShoppingBag } from "lucide-react";
+import { ShoppingBag, ShoppingCart } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { OrderDialog } from "@/components/OrderDialog";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 const Supplements = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const ar = language === "ar";
+  const [selected, setSelected] = useState<{ id: string; name: string; price: number } | null>(null);
 
   const { data: products, isLoading } = useQuery({
     queryKey: ["products"],
@@ -14,6 +24,15 @@ const Supplements = () => {
       return data;
     },
   });
+
+  const handleOrder = (p: any) => {
+    if (!user) {
+      toast.error(ar ? "سجّل دخولك أولاً" : "Please log in first");
+      navigate("/login");
+      return;
+    }
+    setSelected({ id: p.id, name: p.name, price: Number(p.price) });
+  };
 
   return (
     <div className="container mx-auto max-w-6xl px-4 py-10">
@@ -38,12 +57,20 @@ const Supplements = () => {
               <div className="p-5">
                 <h3 className="mb-1 text-lg font-semibold text-foreground">{p.name}</h3>
                 <p className="mb-3 text-sm text-muted-foreground line-clamp-2">{p.description}</p>
-                <p className="text-xl font-bold gold-text-gradient">${p.price}</p>
+                <div className="flex items-center justify-between">
+                  <p className="text-xl font-bold gold-text-gradient">${p.price}</p>
+                  <Button size="sm" className="gold-gradient text-primary-foreground" onClick={() => handleOrder(p)}>
+                    <ShoppingCart className="mr-1 h-4 w-4" />
+                    {ar ? "اطلب" : "Order"}
+                  </Button>
+                </div>
               </div>
             </div>
           ))}
         </div>
       )}
+
+      <OrderDialog open={!!selected} onOpenChange={(o) => !o && setSelected(null)} product={selected} />
     </div>
   );
 };
