@@ -38,11 +38,33 @@ export function PaymentDialog({ open, onOpenChange, amount, tier, onSuccess }: P
     },
   });
 
-  const stripeStub = (method: string) => () => {
-    toast({
-      title: ar ? "نظام الدفع غير مهيأ بعد" : "Payment system not configured yet",
-      description: ar ? `${method} سيتم تفعيله قريباً.` : `${method} will be enabled soon.`,
-    });
+  const submitForApproval = async (method: string) => {
+    if (!user) return;
+    setUploading(true);
+    try {
+      const { error } = await supabase.from("payment_requests").insert({
+        user_id: user.id,
+        tier,
+        amount,
+        method,
+        admin_note: note || null,
+      });
+      if (error) throw error;
+      toast({
+        title: ar ? "تم الإرسال للموافقة" : "Sent for approval",
+        description: ar
+          ? `طلب دفع ${method} في انتظار موافقة المسؤول.`
+          : `Your ${method} payment is awaiting admin approval.`,
+      });
+      qc.invalidateQueries({ queryKey: ["pending-payment"] });
+      onSuccess?.();
+      onOpenChange(false);
+      setNote("");
+    } catch (e: any) {
+      toast({ title: ar ? "خطأ" : "Error", description: e.message, variant: "destructive" });
+    } finally {
+      setUploading(false);
+    }
   };
 
   const submitManual = async () => {
@@ -109,31 +131,39 @@ export function PaymentDialog({ open, onOpenChange, amount, tier, onSuccess }: P
               <Input placeholder="MM/YY" disabled />
               <Input placeholder="CVC" disabled />
             </div>
-            <Button className="w-full gold-gradient text-primary-foreground" onClick={stripeStub("Stripe")}>
-              {ar ? `ادفع $${amount}` : `Pay $${amount}`}
+            <Button className="w-full gold-gradient text-primary-foreground" onClick={() => submitForApproval("card")} disabled={uploading}>
+              {uploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              {ar ? `طلب الموافقة — $${amount}` : `Request Approval — $${amount}`}
             </Button>
+            <p className="text-xs text-muted-foreground">{ar ? "سيقوم المسؤول بمراجعة طلبك" : "Admin will review and approve your request"}</p>
           </TabsContent>
 
           <TabsContent value="paypal" className="space-y-3 pt-4">
             <p className="text-sm text-muted-foreground">{ar ? "الدفع عبر PayPal" : "Pay with PayPal"}</p>
-            <Button className="w-full bg-[#0070ba] text-white hover:bg-[#005ea6]" onClick={stripeStub("PayPal")}>
-              {ar ? "متابعة إلى PayPal" : "Continue to PayPal"}
+            <Textarea placeholder={ar ? "ملاحظة (اختياري)" : "Note (optional)"} value={note} onChange={(e) => setNote(e.target.value)} />
+            <Button className="w-full bg-[#0070ba] text-white hover:bg-[#005ea6]" onClick={() => submitForApproval("paypal")} disabled={uploading}>
+              {uploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              {ar ? "إرسال للموافقة" : "Send for Approval"}
             </Button>
           </TabsContent>
 
           <TabsContent value="wise" className="space-y-3 pt-4">
             <p className="text-sm text-muted-foreground">{ar ? "تحويل دولي عبر Wise" : "International transfer via Wise"}</p>
-            <Button className="w-full bg-[#9fe870] text-black hover:opacity-90" onClick={stripeStub("Wise")}>
-              {ar ? "متابعة إلى Wise" : "Continue to Wise"}
+            <Textarea placeholder={ar ? "ملاحظة (اختياري)" : "Note (optional)"} value={note} onChange={(e) => setNote(e.target.value)} />
+            <Button className="w-full bg-[#9fe870] text-black hover:opacity-90" onClick={() => submitForApproval("wise")} disabled={uploading}>
+              {uploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              {ar ? "إرسال للموافقة" : "Send for Approval"}
             </Button>
           </TabsContent>
 
           <TabsContent value="bank" className="space-y-3 pt-4">
             <pre className="whitespace-pre-wrap rounded-md border border-border bg-secondary p-3 text-xs text-foreground">
-              {settings?.bank_details || "Bank details not set"}
+              {settings?.bank_details || (ar ? "لم يتم ضبط تفاصيل البنك" : "Bank details not set")}
             </pre>
-            <Button className="w-full" variant="outline" onClick={stripeStub("Bank Transfer")}>
-              {ar ? "تأكيد التحويل" : "Confirm Transfer"}
+            <Textarea placeholder={ar ? "مرجع التحويل / ملاحظة" : "Transfer reference / note"} value={note} onChange={(e) => setNote(e.target.value)} />
+            <Button className="w-full" variant="outline" onClick={() => submitForApproval("bank")} disabled={uploading}>
+              {uploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              {ar ? "تأكيد التحويل وإرسال للموافقة" : "Confirm Transfer & Send for Approval"}
             </Button>
           </TabsContent>
 
