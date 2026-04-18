@@ -28,6 +28,7 @@ const Admin = () => {
     { key: "dashboard" as Tab, icon: LayoutDashboard, label: t("admin.dashboard") },
     { key: "customers" as Tab, icon: Users, label: t("admin.customers") },
     { key: "products" as Tab, icon: Package, label: t("admin.products") },
+    { key: "orders" as Tab, icon: ShoppingCart, label: language === "ar" ? "الطلبات" : "Orders" },
     { key: "payments" as Tab, icon: CreditCard, label: language === "ar" ? "المدفوعات" : "Payments" },
     { key: "wallets" as Tab, icon: Wallet, label: language === "ar" ? "المحافظ" : "Wallets" },
     { key: "chat" as Tab, icon: MessagesSquare, label: language === "ar" ? "المحادثات" : "Chats" },
@@ -58,6 +59,7 @@ const Admin = () => {
         {tab === "dashboard" && <AdminDashboard />}
         {tab === "customers" && <AdminCustomers />}
         {tab === "products" && <AdminProducts />}
+        {tab === "orders" && <AdminOrders />}
         {tab === "payments" && <AdminPayments />}
         {tab === "wallets" && <AdminWallets />}
         {tab === "chat" && <AdminChat />}
