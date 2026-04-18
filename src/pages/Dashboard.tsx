@@ -7,6 +7,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { generateContent, getAllPlatforms, getPlatformLabel, Platform } from "@/lib/contentTemplates";
 import { PricingCards } from "@/components/PricingCards";
+import { AnnouncementBanner } from "@/components/AnnouncementBanner";
+import { SupportChat } from "@/components/SupportChat";
 import { Sparkles, Copy, Check, Crown, Zap, AlertTriangle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -71,6 +73,7 @@ const Dashboard = () => {
 
   return (
     <div className="container mx-auto max-w-4xl px-4 py-10">
+      <AnnouncementBanner />
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-3xl font-bold gold-text-gradient">{t("dashboard.title")}</h1>
         <div className="flex items-center gap-3">
@@ -183,6 +186,10 @@ const Dashboard = () => {
           </Button>
         </div>
       )}
+
+      <div className="mt-10">
+        <SupportChat />
+      </div>
     </div>
   );
 };
