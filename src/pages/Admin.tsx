@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { Navigate } from "react-router-dom";
-import { LayoutDashboard, Users, Package, CreditCard, MessageCircle, Settings, Wallet, Megaphone, MessagesSquare } from "lucide-react";
+import { LayoutDashboard, Users, Package, CreditCard, MessageCircle, Settings, Wallet, Megaphone, MessagesSquare, ShoppingCart } from "lucide-react";
 import { AdminDashboard } from "@/components/admin/AdminDashboard";
 import { AdminCustomers } from "@/components/admin/AdminCustomers";
 import { AdminProducts } from "@/components/admin/AdminProducts";
@@ -11,9 +11,10 @@ import { AdminWallets } from "@/components/admin/AdminWallets";
 import { AdminCustomerCare } from "@/components/admin/AdminCustomerCare";
 import { AdminChat } from "@/components/admin/AdminChat";
 import { AdminAnnouncements } from "@/components/admin/AdminAnnouncements";
+import { AdminOrders } from "@/components/admin/AdminOrders";
 import { AdminSettings } from "@/components/admin/AdminSettings";
 
-type Tab = "dashboard" | "customers" | "products" | "payments" | "wallets" | "chat" | "announcements" | "care" | "settings";
+type Tab = "dashboard" | "customers" | "products" | "orders" | "payments" | "wallets" | "chat" | "announcements" | "care" | "settings";
 
 const Admin = () => {
   const { t, language } = useLanguage();
