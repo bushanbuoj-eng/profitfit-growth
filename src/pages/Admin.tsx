@@ -39,7 +39,7 @@ const Admin = () => {
 
   return (
     <div className="flex min-h-[calc(100vh-4rem)]">
-      <aside className="w-16 border-r border-border bg-card md:w-56">
+      <aside className="w-16 shrink-0 overflow-y-auto border-r border-border bg-card md:w-56 max-h-[calc(100vh-4rem)] sticky top-16">
         <nav className="flex flex-col gap-1 p-2">
           {tabs.map((tb) => (
             <button

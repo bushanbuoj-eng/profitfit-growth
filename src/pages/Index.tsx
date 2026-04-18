@@ -20,25 +20,38 @@ const Index = () => {
             <span className="gold-text-gradient">{t("hero.title")}</span>
           </h1>
           <p className="mx-auto mb-8 max-w-2xl text-lg text-muted-foreground md:text-xl">{t("hero.subtitle")}</p>
-          <Button
-            size="lg"
-            className="gold-gradient text-primary-foreground text-lg px-10 py-6 font-semibold shadow-lg hover:opacity-90 transition-opacity"
-            onClick={() => navigate("/signup")}
-          >
-            {t("hero.cta")} <ChevronRight className="ml-1" />
-          </Button>
+          <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Button
+              size="lg"
+              className="gold-gradient text-primary-foreground text-lg px-10 py-6 font-semibold shadow-lg hover:opacity-90 transition-opacity"
+              onClick={() => navigate("/signup")}
+            >
+              {t("hero.cta")} <ChevronRight className="ml-1" />
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="border-primary text-primary hover:bg-primary/10 text-lg px-10 py-6"
+              onClick={() => document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth" })}
+            >
+              {language === "ar" ? "عرض الخطط" : "View Plans"}
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing — moved up for visibility */}
+      <section id="pricing" className="border-t border-border px-4 py-20">
+        <div className="container mx-auto max-w-5xl">
+          <h2 className="mb-3 text-center text-3xl font-bold gold-text-gradient md:text-4xl">{t("pricing.title")}</h2>
+          <p className="mb-12 text-center text-muted-foreground">
+            {language === "ar" ? "اختر الخطة المناسبة لك" : "Choose the plan that fits you best"}
+          </p>
+          <PricingCards />
         </div>
       </section>
 
       <DemoSection />
-
-      {/* Pricing */}
-      <section className="border-t border-border px-4 py-20">
-        <div className="container mx-auto max-w-5xl">
-          <h2 className="mb-12 text-center text-3xl font-bold gold-text-gradient md:text-4xl">{t("pricing.title")}</h2>
-          <PricingCards />
-        </div>
-      </section>
 
       <TestimonialsSection />
     </div>
