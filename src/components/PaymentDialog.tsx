@@ -29,6 +29,7 @@ export function PaymentDialog({ open, onOpenChange, amount, tier, onSuccess }: P
   const [file, setFile] = useState<File | null>(null);
   const [note, setNote] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [method, setMethod] = useState("manual");
 
   const { data: settings } = useQuery({
     queryKey: ["payment-settings"],
@@ -38,39 +39,14 @@ export function PaymentDialog({ open, onOpenChange, amount, tier, onSuccess }: P
     },
   });
 
-  const submitForApproval = async (method: string) => {
-    if (!user) return;
-    setUploading(true);
-    try {
-      const { error } = await supabase.from("payment_requests").insert({
-        user_id: user.id,
-        tier,
-        amount,
-        method,
-        admin_note: note || null,
-      });
-      if (error) throw error;
-      toast({
-        title: ar ? "تم الإرسال للموافقة" : "Sent for approval",
-        description: ar
-          ? `طلب دفع ${method} في انتظار موافقة المسؤول.`
-          : `Your ${method} payment is awaiting admin approval.`,
-      });
-      qc.invalidateQueries({ queryKey: ["pending-payment"] });
-      onSuccess?.();
-      onOpenChange(false);
-      setNote("");
-    } catch (e: any) {
-      toast({ title: ar ? "خطأ" : "Error", description: e.message, variant: "destructive" });
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  const submitManual = async () => {
+  const submit = async (m: string) => {
     if (!user) return;
     if (!file) {
-      toast({ title: ar ? "مطلوب" : "Required", description: ar ? "يرجى رفع إثبات الدفع" : "Please upload payment evidence", variant: "destructive" });
+      toast({
+        title: ar ? "إثبات الدفع مطلوب" : "Payment proof required",
+        description: ar ? "يرجى رفع لقطة شاشة أو إيصال قبل الإرسال" : "Please upload a screenshot or receipt before submitting",
+        variant: "destructive",
+      });
       return;
     }
     setUploading(true);
@@ -84,13 +60,16 @@ export function PaymentDialog({ open, onOpenChange, amount, tier, onSuccess }: P
         user_id: user.id,
         tier,
         amount,
-        method: "manual",
+        method: m,
         evidence_url: path,
         admin_note: note || null,
       });
       if (error) throw error;
 
-      toast({ title: ar ? "تم الإرسال" : "Submitted", description: ar ? "في انتظار موافقة المسؤول" : "Pending admin approval" });
+      toast({
+        title: ar ? "تم الإرسال للموافقة" : "Sent for approval",
+        description: ar ? "سيقوم المسؤول بمراجعة الدفع قريباً." : "Admin will review your payment shortly.",
+      });
       qc.invalidateQueries({ queryKey: ["pending-payment"] });
       onSuccess?.();
       onOpenChange(false);
@@ -103,6 +82,21 @@ export function PaymentDialog({ open, onOpenChange, amount, tier, onSuccess }: P
     }
   };
 
+  const ProofBlock = (
+    <div className="space-y-2 rounded-md border border-primary/30 bg-primary/5 p-3">
+      <Label className="text-xs font-semibold text-primary">
+        {ar ? "إثبات الدفع (صورة/PDF) — مطلوب" : "Payment proof (image/PDF) — required"}
+      </Label>
+      <Input type="file" accept="image/*,application/pdf" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
+      <Textarea
+        placeholder={ar ? "ملاحظة (اختياري)" : "Note (optional)"}
+        value={note}
+        onChange={(e) => setNote(e.target.value)}
+        rows={2}
+      />
+    </div>
+  );
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg">
@@ -113,46 +107,54 @@ export function PaymentDialog({ open, onOpenChange, amount, tier, onSuccess }: P
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs defaultValue="card" className="mt-2">
+        <Tabs defaultValue="manual" onValueChange={setMethod} className="mt-2">
           <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="manual"><Wallet className="h-4 w-4" /></TabsTrigger>
             <TabsTrigger value="card"><CreditCard className="h-4 w-4" /></TabsTrigger>
             <TabsTrigger value="paypal">PayPal</TabsTrigger>
             <TabsTrigger value="wise"><Globe className="h-4 w-4" /></TabsTrigger>
             <TabsTrigger value="bank"><Building2 className="h-4 w-4" /></TabsTrigger>
-            <TabsTrigger value="manual"><Wallet className="h-4 w-4" /></TabsTrigger>
           </TabsList>
 
-          <TabsContent value="card" className="space-y-3 pt-4">
-            <div className="space-y-2">
-              <Label>{ar ? "رقم البطاقة" : "Card Number"}</Label>
-              <Input placeholder="4242 4242 4242 4242" disabled />
+          <TabsContent value="manual" className="space-y-3 pt-4">
+            <div className="rounded-md border border-border bg-secondary p-3 text-xs">
+              <p className="mb-2 font-semibold text-foreground">{ar ? "تعليمات الدفع" : "Payment Instructions"}</p>
+              <p className="whitespace-pre-wrap text-foreground/80">{settings?.manual_payment_instructions || (ar ? "اتصل بالمسؤول للحصول على تعليمات الدفع." : "Contact admin for payment instructions.")}</p>
+              {settings?.paybill_details && <pre className="mt-2 whitespace-pre-wrap text-foreground/70">{settings.paybill_details}</pre>}
             </div>
-            <div className="grid grid-cols-2 gap-2">
-              <Input placeholder="MM/YY" disabled />
-              <Input placeholder="CVC" disabled />
-            </div>
-            <Button className="w-full gold-gradient text-primary-foreground" onClick={() => submitForApproval("card")} disabled={uploading}>
-              {uploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-              {ar ? `طلب الموافقة — $${amount}` : `Request Approval — $${amount}`}
+            {ProofBlock}
+            <Button className="w-full gold-gradient text-primary-foreground" onClick={() => submit("manual")} disabled={uploading || !file}>
+              {uploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
+              {ar ? "إرسال للموافقة" : "Submit for Approval"}
             </Button>
-            <p className="text-xs text-muted-foreground">{ar ? "سيقوم المسؤول بمراجعة طلبك" : "Admin will review and approve your request"}</p>
+          </TabsContent>
+
+          <TabsContent value="card" className="space-y-3 pt-4">
+            <p className="text-sm text-muted-foreground">
+              {ar ? "ادفع عبر بطاقتك ثم ارفق إيصال الدفع." : "Pay with your card, then attach the payment receipt."}
+            </p>
+            {ProofBlock}
+            <Button className="w-full gold-gradient text-primary-foreground" onClick={() => submit("card")} disabled={uploading || !file}>
+              {uploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
+              {ar ? "إرسال للموافقة" : "Submit for Approval"}
+            </Button>
           </TabsContent>
 
           <TabsContent value="paypal" className="space-y-3 pt-4">
-            <p className="text-sm text-muted-foreground">{ar ? "الدفع عبر PayPal" : "Pay with PayPal"}</p>
-            <Textarea placeholder={ar ? "ملاحظة (اختياري)" : "Note (optional)"} value={note} onChange={(e) => setNote(e.target.value)} />
-            <Button className="w-full bg-[#0070ba] text-white hover:bg-[#005ea6]" onClick={() => submitForApproval("paypal")} disabled={uploading}>
-              {uploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-              {ar ? "إرسال للموافقة" : "Send for Approval"}
+            <p className="text-sm text-muted-foreground">{ar ? "أرسل عبر PayPal ثم ارفق لقطة شاشة للمعاملة." : "Send via PayPal, then attach a screenshot of the transaction."}</p>
+            {ProofBlock}
+            <Button className="w-full bg-[#0070ba] text-white hover:bg-[#005ea6]" onClick={() => submit("paypal")} disabled={uploading || !file}>
+              {uploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
+              {ar ? "إرسال للموافقة" : "Submit for Approval"}
             </Button>
           </TabsContent>
 
           <TabsContent value="wise" className="space-y-3 pt-4">
-            <p className="text-sm text-muted-foreground">{ar ? "تحويل دولي عبر Wise" : "International transfer via Wise"}</p>
-            <Textarea placeholder={ar ? "ملاحظة (اختياري)" : "Note (optional)"} value={note} onChange={(e) => setNote(e.target.value)} />
-            <Button className="w-full bg-[#9fe870] text-black hover:opacity-90" onClick={() => submitForApproval("wise")} disabled={uploading}>
-              {uploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-              {ar ? "إرسال للموافقة" : "Send for Approval"}
+            <p className="text-sm text-muted-foreground">{ar ? "أرسل تحويل Wise ثم ارفع الإيصال." : "Send a Wise transfer, then upload the receipt."}</p>
+            {ProofBlock}
+            <Button className="w-full bg-[#9fe870] text-black hover:opacity-90" onClick={() => submit("wise")} disabled={uploading || !file}>
+              {uploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
+              {ar ? "إرسال للموافقة" : "Submit for Approval"}
             </Button>
           </TabsContent>
 
@@ -160,27 +162,10 @@ export function PaymentDialog({ open, onOpenChange, amount, tier, onSuccess }: P
             <pre className="whitespace-pre-wrap rounded-md border border-border bg-secondary p-3 text-xs text-foreground">
               {settings?.bank_details || (ar ? "لم يتم ضبط تفاصيل البنك" : "Bank details not set")}
             </pre>
-            <Textarea placeholder={ar ? "مرجع التحويل / ملاحظة" : "Transfer reference / note"} value={note} onChange={(e) => setNote(e.target.value)} />
-            <Button className="w-full" variant="outline" onClick={() => submitForApproval("bank")} disabled={uploading}>
-              {uploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-              {ar ? "تأكيد التحويل وإرسال للموافقة" : "Confirm Transfer & Send for Approval"}
-            </Button>
-          </TabsContent>
-
-          <TabsContent value="manual" className="space-y-3 pt-4">
-            <div className="rounded-md border border-primary/30 bg-primary/5 p-3 text-xs">
-              <p className="mb-2 font-semibold text-primary">{ar ? "تعليمات الدفع" : "Payment Instructions"}</p>
-              <p className="whitespace-pre-wrap text-foreground/80">{settings?.manual_payment_instructions}</p>
-              {settings?.paybill_details && <pre className="mt-2 whitespace-pre-wrap text-foreground/70">{settings.paybill_details}</pre>}
-            </div>
-            <div className="space-y-2">
-              <Label>{ar ? "إثبات الدفع (صورة/PDF)" : "Payment evidence (image/PDF)"}</Label>
-              <Input type="file" accept="image/*,application/pdf" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
-            </div>
-            <Textarea placeholder={ar ? "ملاحظة (اختياري)" : "Note (optional)"} value={note} onChange={(e) => setNote(e.target.value)} />
-            <Button className="w-full gold-gradient text-primary-foreground" onClick={submitManual} disabled={uploading || !file}>
+            {ProofBlock}
+            <Button className="w-full" variant="outline" onClick={() => submit("bank")} disabled={uploading || !file}>
               {uploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
-              {ar ? "إرسال للموافقة" : "Submit for Approval"}
+              {ar ? "تأكيد التحويل وإرسال للموافقة" : "Confirm Transfer & Submit for Approval"}
             </Button>
           </TabsContent>
         </Tabs>

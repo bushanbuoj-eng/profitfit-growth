@@ -21,6 +21,7 @@ import Settings from "./pages/Settings";
 import Messages from "./pages/Messages";
 import PaymentsPage from "./pages/Payments";
 import HistoryPage from "./pages/History";
+import Contact from "./pages/Contact";
 import Admin from "./pages/Admin";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
@@ -53,6 +54,7 @@ const App = () => {
                       <Route path="/messages" element={<Messages />} />
                       <Route path="/payments" element={<PaymentsPage />} />
                       <Route path="/history" element={<HistoryPage />} />
+                      <Route path="/contact" element={<Contact />} />
                       <Route path="/admin" element={<Admin />} />
                       <Route path="/forgot-password" element={<ForgotPassword />} />
                       <Route path="/reset-password" element={<ResetPassword />} />

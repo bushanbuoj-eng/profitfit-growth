@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   Menu, X, Wallet, User, Settings as SettingsIcon, MessageSquare,
-  CreditCard, History, LayoutDashboard, Pill, Shield, LogOut, ChevronDown,
+  CreditCard, History, LayoutDashboard, Pill, Shield, LogOut, ChevronDown, Phone,
 } from "lucide-react";
 import { useState } from "react";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -34,6 +34,7 @@ export function Header() {
     { to: "/messages", icon: MessageSquare, label: ar ? "الرسائل" : "Messages" },
     { to: "/profile", icon: User, label: t("nav.profile") },
     { to: "/settings", icon: SettingsIcon, label: ar ? "الإعدادات" : "Settings" },
+    { to: "/contact", icon: Phone, label: ar ? "اتصل بنا" : "Contact Us" },
   ];
 
   return (
