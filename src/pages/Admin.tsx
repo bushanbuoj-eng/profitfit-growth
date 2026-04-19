@@ -56,7 +56,7 @@ const Admin = () => {
         </nav>
       </aside>
       <main className="flex-1 p-4 md:p-8">
-        {tab === "dashboard" && <AdminDashboard />}
+        {tab === "dashboard" && <AdminDashboard onNavigate={(t) => setTab(t as Tab)} />}
         {tab === "customers" && <AdminCustomers />}
         {tab === "products" && <AdminProducts />}
         {tab === "orders" && <AdminOrders />}
