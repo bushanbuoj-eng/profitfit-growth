@@ -67,11 +67,11 @@ export function AdminDashboard({ onNavigate }: { onNavigate?: (tab: string) => v
   const stats = [
     { label: ar ? "إجمالي الإيرادات" : "Total Revenue", value: `$${(revenue?.total ?? 0).toFixed(2)}`, icon: DollarSign, accent: true },
     { label: ar ? "إيرادات هذا الشهر" : "This Month", value: `$${(revenue?.month ?? 0).toFixed(2)}`, icon: TrendingUp, accent: true },
-    { label: t("admin.total_users"), value: userCount ?? "—", icon: Users },
-    { label: ar ? "اشتراكات نشطة" : "Active Subscriptions", value: activeSubscriptions ?? "—", icon: Crown },
-    { label: t("admin.total_products"), value: productCount ?? "—", icon: Package },
-    { label: ar ? "مدفوعات معلقة" : "Pending Payments", value: pendingPayments ?? "—", icon: CreditCard },
-    { label: ar ? "إيداعات معلقة" : "Pending Deposits", value: pendingDeposits ?? "—", icon: Clock },
+    { label: t("admin.total_users"), value: userCount ?? "—", icon: Users, tab: "customers" },
+    { label: ar ? "اشتراكات نشطة" : "Active Subscriptions", value: activeSubscriptions ?? "—", icon: Crown, tab: "payments" },
+    { label: t("admin.total_products"), value: productCount ?? "—", icon: Package, tab: "products" },
+    { label: ar ? "مدفوعات معلقة" : "Pending Payments", value: pendingPayments ?? "—", icon: CreditCard, tab: "payments", highlight: (pendingPayments ?? 0) > 0 },
+    { label: ar ? "إيداعات معلقة" : "Pending Deposits", value: pendingDeposits ?? "—", icon: Clock, tab: "wallets", highlight: (pendingDeposits ?? 0) > 0 },
   ];
 
   const statusBadge = (s: string) => {
@@ -88,15 +88,29 @@ export function AdminDashboard({ onNavigate }: { onNavigate?: (tab: string) => v
       <h1 className="text-2xl font-bold gold-text-gradient">{t("admin.dashboard")}</h1>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((s) => (
-          <div key={s.label} className={`rounded-xl border p-5 ${s.accent ? "border-primary/40 bg-primary/5 gold-glow" : "border-border bg-card"}`}>
-            <div className="mb-2 flex items-center justify-between">
-              <p className="text-xs text-muted-foreground">{s.label}</p>
-              <s.icon className={`h-4 w-4 ${s.accent ? "text-primary" : "text-muted-foreground"}`} />
-            </div>
-            <p className={`text-3xl font-bold ${s.accent ? "gold-text-gradient" : "text-foreground"}`}>{s.value}</p>
-          </div>
-        ))}
+        {stats.map((s: any) => {
+          const clickable = !!s.tab && !!onNavigate;
+          return (
+            <button
+              key={s.label}
+              type="button"
+              disabled={!clickable}
+              onClick={() => clickable && onNavigate!(s.tab)}
+              className={`text-left rounded-xl border p-5 transition-all ${
+                s.accent ? "border-primary/40 bg-primary/5 gold-glow" :
+                s.highlight ? "border-yellow-500/50 bg-yellow-500/5 hover:bg-yellow-500/10" :
+                "border-border bg-card"
+              } ${clickable ? "cursor-pointer hover:border-primary/60 hover:-translate-y-0.5" : "cursor-default"}`}
+            >
+              <div className="mb-2 flex items-center justify-between">
+                <p className="text-xs text-muted-foreground">{s.label}</p>
+                <s.icon className={`h-4 w-4 ${s.accent ? "text-primary" : s.highlight ? "text-yellow-500" : "text-muted-foreground"}`} />
+              </div>
+              <p className={`text-3xl font-bold ${s.accent ? "gold-text-gradient" : "text-foreground"}`}>{s.value}</p>
+              {clickable && <p className="mt-1 text-[10px] uppercase tracking-wide text-primary/70">{ar ? "اضغط للعرض ←" : "Click to manage →"}</p>}
+            </button>
+          );
+        })}
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
