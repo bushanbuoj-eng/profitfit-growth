@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { DollarSign, Users, Package, CreditCard, TrendingUp, Crown, Clock, CheckCircle } from "lucide-react";
 
-export function AdminDashboard() {
+export function AdminDashboard({ onNavigate }: { onNavigate?: (tab: string) => void } = {}) {
   const { t, language } = useLanguage();
   const ar = language === "ar";
 
