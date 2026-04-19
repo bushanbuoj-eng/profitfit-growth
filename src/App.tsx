@@ -17,6 +17,10 @@ import Dashboard from "./pages/Dashboard";
 import Supplements from "./pages/Supplements";
 import Profile from "./pages/Profile";
 import Wallet from "./pages/Wallet";
+import Settings from "./pages/Settings";
+import Messages from "./pages/Messages";
+import PaymentsPage from "./pages/Payments";
+import HistoryPage from "./pages/History";
 import Admin from "./pages/Admin";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
@@ -45,6 +49,10 @@ const App = () => {
                       <Route path="/supplements" element={<Supplements />} />
                       <Route path="/profile" element={<Profile />} />
                       <Route path="/wallet" element={<Wallet />} />
+                      <Route path="/settings" element={<Settings />} />
+                      <Route path="/messages" element={<Messages />} />
+                      <Route path="/payments" element={<PaymentsPage />} />
+                      <Route path="/history" element={<HistoryPage />} />
                       <Route path="/admin" element={<Admin />} />
                       <Route path="/forgot-password" element={<ForgotPassword />} />
                       <Route path="/reset-password" element={<ResetPassword />} />
