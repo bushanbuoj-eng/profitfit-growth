@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   Menu, X, Wallet, User, Settings as SettingsIcon, MessageSquare,
-  CreditCard, History, LayoutDashboard, Pill, Shield, LogOut, ChevronDown, Phone,
+  CreditCard, History, LayoutDashboard, Pill, Shield, LogOut, ChevronDown, Phone, Megaphone,
 } from "lucide-react";
 import { useState } from "react";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -28,6 +28,7 @@ export function Header() {
   const userMenuItems = [
     { to: "/dashboard", icon: LayoutDashboard, label: t("nav.dashboard") },
     { to: "/supplements", icon: Pill, label: t("nav.supplements") },
+    { to: "/marketing", icon: Megaphone, label: ar ? "تسويق" : "Marketing" },
     { to: "/wallet", icon: Wallet, label: ar ? "المحفظة" : "Wallet" },
     { to: "/payments", icon: CreditCard, label: ar ? "المدفوعات" : "Payments" },
     { to: "/history", icon: History, label: ar ? "السجل" : "History" },

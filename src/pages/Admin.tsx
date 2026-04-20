@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { Navigate } from "react-router-dom";
-import { LayoutDashboard, Users, Package, CreditCard, MessageCircle, Settings, Wallet, Megaphone, MessagesSquare, ShoppingCart } from "lucide-react";
+import { LayoutDashboard, Users, Package, CreditCard, MessageCircle, Settings, Wallet, Megaphone, MessagesSquare, ShoppingCart, Sparkles } from "lucide-react";
 import { AdminDashboard } from "@/components/admin/AdminDashboard";
 import { AdminCustomers } from "@/components/admin/AdminCustomers";
 import { AdminProducts } from "@/components/admin/AdminProducts";
@@ -12,9 +12,10 @@ import { AdminCustomerCare } from "@/components/admin/AdminCustomerCare";
 import { AdminChat } from "@/components/admin/AdminChat";
 import { AdminAnnouncements } from "@/components/admin/AdminAnnouncements";
 import { AdminOrders } from "@/components/admin/AdminOrders";
+import { AdminPromotions } from "@/components/admin/AdminPromotions";
 import { AdminSettings } from "@/components/admin/AdminSettings";
 
-type Tab = "dashboard" | "customers" | "products" | "orders" | "payments" | "wallets" | "chat" | "announcements" | "care" | "settings";
+type Tab = "dashboard" | "customers" | "products" | "orders" | "payments" | "wallets" | "promotions" | "chat" | "announcements" | "care" | "settings";
 
 const Admin = () => {
   const { t, language } = useLanguage();
@@ -31,6 +32,7 @@ const Admin = () => {
     { key: "orders" as Tab, icon: ShoppingCart, label: language === "ar" ? "الطلبات" : "Orders" },
     { key: "payments" as Tab, icon: CreditCard, label: language === "ar" ? "المدفوعات" : "Payments" },
     { key: "wallets" as Tab, icon: Wallet, label: language === "ar" ? "المحافظ" : "Wallets" },
+    { key: "promotions" as Tab, icon: Sparkles, label: language === "ar" ? "تسويق" : "Marketing" },
     { key: "chat" as Tab, icon: MessagesSquare, label: language === "ar" ? "المحادثات" : "Chats" },
     { key: "announcements" as Tab, icon: Megaphone, label: language === "ar" ? "الإعلانات" : "Announcements" },
     { key: "care" as Tab, icon: MessageCircle, label: language === "ar" ? "واتساب" : "WhatsApp" },
@@ -62,6 +64,7 @@ const Admin = () => {
         {tab === "orders" && <AdminOrders />}
         {tab === "payments" && <AdminPayments />}
         {tab === "wallets" && <AdminWallets />}
+        {tab === "promotions" && <AdminPromotions />}
         {tab === "chat" && <AdminChat />}
         {tab === "announcements" && <AdminAnnouncements />}
         {tab === "care" && <AdminCustomerCare />}
