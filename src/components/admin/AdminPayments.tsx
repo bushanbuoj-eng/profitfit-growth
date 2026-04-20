@@ -16,10 +16,15 @@ export function AdminPayments() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("payment_requests")
-        .select("*, profiles:user_id(email)")
+        .select("*")
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data;
+      const ids = Array.from(new Set((data ?? []).map((p: any) => p.user_id)));
+      const { data: profs } = ids.length
+        ? await supabase.from("profiles").select("id,email").in("id", ids)
+        : { data: [] as any[] };
+      const map = new Map((profs ?? []).map((p: any) => [p.id, p.email]));
+      return (data ?? []).map((p: any) => ({ ...p, profiles: { email: map.get(p.user_id) } }));
     },
   });
 

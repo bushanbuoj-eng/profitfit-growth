@@ -46,21 +46,27 @@ export function AdminDashboard({ onNavigate }: { onNavigate?: (tab: string) => v
     },
   });
 
-  // Recent subscription approvals
+  const attachEmails = async (rows: any[]) => {
+    const ids = Array.from(new Set(rows.map((r) => r.user_id)));
+    if (!ids.length) return rows;
+    const { data: profs } = await supabase.from("profiles").select("id,email").in("id", ids);
+    const map = new Map((profs ?? []).map((p: any) => [p.id, p.email]));
+    return rows.map((r) => ({ ...r, profiles: { email: map.get(r.user_id) } }));
+  };
+
   const { data: recentSubs } = useQuery({
     queryKey: ["admin-recent-subs"],
     queryFn: async () => {
-      const { data } = await supabase.from("payment_requests").select("*, profiles:user_id(email)").eq("status", "approved").order("updated_at", { ascending: false }).limit(5);
-      return data ?? [];
+      const { data } = await supabase.from("payment_requests").select("*").eq("status", "approved").order("updated_at", { ascending: false }).limit(5);
+      return attachEmails(data ?? []);
     },
   });
 
-  // Recent payments (any status, latest activity)
   const { data: recentActivity } = useQuery({
     queryKey: ["admin-recent-activity"],
     queryFn: async () => {
-      const { data } = await supabase.from("payment_requests").select("*, profiles:user_id(email)").order("created_at", { ascending: false }).limit(8);
-      return data ?? [];
+      const { data } = await supabase.from("payment_requests").select("*").order("created_at", { ascending: false }).limit(8);
+      return attachEmails(data ?? []);
     },
   });
 
