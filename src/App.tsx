@@ -22,6 +22,7 @@ import Messages from "./pages/Messages";
 import PaymentsPage from "./pages/Payments";
 import HistoryPage from "./pages/History";
 import Contact from "./pages/Contact";
+import Marketing from "./pages/Marketing";
 import Admin from "./pages/Admin";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
@@ -55,6 +56,7 @@ const App = () => {
                       <Route path="/payments" element={<PaymentsPage />} />
                       <Route path="/history" element={<HistoryPage />} />
                       <Route path="/contact" element={<Contact />} />
+                      <Route path="/marketing" element={<Marketing />} />
                       <Route path="/admin" element={<Admin />} />
                       <Route path="/forgot-password" element={<ForgotPassword />} />
                       <Route path="/reset-password" element={<ResetPassword />} />
