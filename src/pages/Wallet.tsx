@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Wallet as WalletIcon, Upload, Loader2, Clock, CheckCircle, XCircle } from "lucide-react";
+import { BackButton } from "@/components/BackButton";
 
 const Wallet = () => {
   const { user, loading } = useAuth();
@@ -67,8 +68,9 @@ const Wallet = () => {
   const statusIcon = (s: string) => s === "approved" ? <CheckCircle className="h-4 w-4 text-green-500" /> : s === "rejected" ? <XCircle className="h-4 w-4 text-red-500" /> : <Clock className="h-4 w-4 text-yellow-500" />;
 
   return (
-    <div className="container mx-auto max-w-3xl px-4 py-10">
-      <h1 className="mb-6 text-3xl font-bold gold-text-gradient">{ar ? "المحفظة" : "Wallet"}</h1>
+    <div className="container mx-auto max-w-3xl px-4 py-6 sm:py-10">
+      <BackButton className="mb-3 -ml-2" />
+      <h1 className="mb-6 text-2xl sm:text-3xl font-bold gold-text-gradient">{ar ? "المحفظة" : "Wallet"}</h1>
 
       <Card className="mb-6 gold-glow border-primary/30 p-6">
         <div className="flex items-center gap-4">

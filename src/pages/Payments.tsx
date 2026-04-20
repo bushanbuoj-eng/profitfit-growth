@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Navigate } from "react-router-dom";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { CreditCard } from "lucide-react";
+import { BackButton } from "@/components/BackButton";
 
 const Payments = () => {
   const { user, loading } = useAuth();
@@ -47,10 +48,11 @@ const Payments = () => {
   };
 
   return (
-    <div className="container mx-auto max-w-4xl px-4 py-10">
+    <div className="container mx-auto max-w-4xl px-4 py-6 sm:py-10">
+      <BackButton className="mb-3 -ml-2" />
       <div className="mb-8 flex items-center gap-3">
-        <CreditCard className="h-7 w-7 text-primary" />
-        <h1 className="text-3xl font-bold gold-text-gradient">{ar ? "مدفوعاتي" : "My Payments"}</h1>
+        <CreditCard className="h-6 w-6 sm:h-7 sm:w-7 text-primary" />
+        <h1 className="text-2xl sm:text-3xl font-bold gold-text-gradient">{ar ? "مدفوعاتي" : "My Payments"}</h1>
       </div>
 
       <section className="mb-8">

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { User, Globe, Mail, LogOut, BadgeCheck } from "lucide-react";
 import { Link } from "react-router-dom";
+import { BackButton } from "@/components/BackButton";
 
 const Profile = () => {
   const { t, language } = useLanguage();
@@ -16,8 +17,9 @@ const Profile = () => {
   };
 
   return (
-    <div className="container mx-auto max-w-lg px-4 py-10">
-      <h1 className="mb-8 text-3xl font-bold gold-text-gradient">{t("profile.title")}</h1>
+    <div className="container mx-auto max-w-lg px-4 py-6 sm:py-10">
+      <BackButton className="mb-3 -ml-2" />
+      <h1 className="mb-8 text-2xl sm:text-3xl font-bold gold-text-gradient">{t("profile.title")}</h1>
 
       <div className="rounded-xl border border-border bg-card p-6 gold-glow space-y-6">
         <div className="flex items-center justify-center">

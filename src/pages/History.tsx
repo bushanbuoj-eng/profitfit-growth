@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { Navigate } from "react-router-dom";
 import { History as HistoryIcon, Sparkles } from "lucide-react";
+import { BackButton } from "@/components/BackButton";
 
 const platformIcons: Record<string, string> = {
   instagram: "📸", tiktok: "🎵", youtube: "🎬", facebook: "📘", twitter: "🐦",
@@ -27,10 +28,11 @@ const History = () => {
   if (!user) return <Navigate to="/login" replace />;
 
   return (
-    <div className="container mx-auto max-w-3xl px-4 py-10">
+    <div className="container mx-auto max-w-3xl px-4 py-6 sm:py-10">
+      <BackButton className="mb-3 -ml-2" />
       <div className="mb-8 flex items-center gap-3">
-        <HistoryIcon className="h-7 w-7 text-primary" />
-        <h1 className="text-3xl font-bold gold-text-gradient">{ar ? "سجل التوليد" : "Generation History"}</h1>
+        <HistoryIcon className="h-6 w-6 sm:h-7 sm:w-7 text-primary" />
+        <h1 className="text-2xl sm:text-3xl font-bold gold-text-gradient">{ar ? "سجل التوليد" : "Generation History"}</h1>
       </div>
 
       {logs?.length === 0 ? (
