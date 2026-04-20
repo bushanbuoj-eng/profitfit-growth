@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Megaphone, Upload, Wallet as WalletIcon, CheckCircle2, Clock, XCircle } from "lucide-react";
+import { BackButton } from "@/components/BackButton";
 
 const PROMO_PRICE = 200;
 
@@ -124,6 +125,7 @@ export default function Marketing() {
 
   return (
     <div className="container mx-auto max-w-4xl space-y-6 p-4 md:p-8">
+      <BackButton className="-ml-2" />
       <div className="text-center">
         <Megaphone className="mx-auto h-10 w-10 text-primary" />
         <h1 className="mt-2 text-3xl font-bold gold-text-gradient">{ar ? "تسويق منتجك" : "Promote Your Product"}</h1>

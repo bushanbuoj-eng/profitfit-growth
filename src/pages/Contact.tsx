@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Mail, MessageCircle, MessageSquare, Phone } from "lucide-react";
+import { BackButton } from "@/components/BackButton";
 
 const Contact = () => {
   const { language } = useLanguage();
@@ -50,10 +51,11 @@ const Contact = () => {
   ];
 
   return (
-    <div className="container mx-auto max-w-3xl px-4 py-10">
+    <div className="container mx-auto max-w-3xl px-4 py-6 sm:py-10">
+      <BackButton className="mb-3 -ml-2" />
       <div className="mb-8 flex items-center gap-3">
-        <Phone className="h-7 w-7 text-primary" />
-        <h1 className="text-3xl font-bold gold-text-gradient">{ar ? "اتصل بنا" : "Contact Us"}</h1>
+        <Phone className="h-6 w-6 sm:h-7 sm:w-7 text-primary" />
+        <h1 className="text-2xl sm:text-3xl font-bold gold-text-gradient">{ar ? "اتصل بنا" : "Contact Us"}</h1>
       </div>
       <p className="mb-6 text-sm text-muted-foreground">
         {ar

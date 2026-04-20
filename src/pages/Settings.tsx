@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Navigate } from "react-router-dom";
 import { KeyRound, Mail, Globe, Shield } from "lucide-react";
+import { BackButton } from "@/components/BackButton";
 
 const Settings = () => {
   const { language, setLanguage } = useLanguage();
@@ -42,8 +43,9 @@ const Settings = () => {
   };
 
   return (
-    <div className="container mx-auto max-w-2xl px-4 py-10">
-      <h1 className="mb-8 text-3xl font-bold gold-text-gradient">{ar ? "الإعدادات" : "Settings"}</h1>
+    <div className="container mx-auto max-w-2xl px-4 py-6 sm:py-10">
+      <BackButton className="mb-3 -ml-2" />
+      <h1 className="mb-8 text-2xl sm:text-3xl font-bold gold-text-gradient">{ar ? "الإعدادات" : "Settings"}</h1>
 
       <section className="mb-6 rounded-xl border border-border bg-card p-6 gold-glow">
         <div className="mb-4 flex items-center gap-2">
