@@ -71,6 +71,16 @@ export function PricingCards({ showAction = true }: PricingCardsProps) {
   const handleSubscribe = (planTier: Tier) => {
     if (!user) { navigate("/signup"); return; }
     if (planTier === "free") return;
+    if (hasActivePaid && currentTier !== planTier) {
+      toast({
+        title: language === "ar" ? "اشتراك نشط" : "Active subscription",
+        description: language === "ar"
+          ? `لديك اشتراك نشط في خطة ${currentTier}. لا يمكنك الاشتراك في خطتين في نفس الوقت.`
+          : `You already have an active ${currentTier} subscription. You cannot subscribe to two tiers at the same time.`,
+        variant: "destructive",
+      });
+      return;
+    }
     if (pendingPayment) {
       toast({
         title: language === "ar" ? "طلب قائم" : "Pending Request",
