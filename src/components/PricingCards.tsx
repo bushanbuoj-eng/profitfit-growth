@@ -17,7 +17,8 @@ interface PricingCardsProps {
 export function PricingCards({ showAction = true }: PricingCardsProps) {
   const { t, language } = useLanguage();
   const { user } = useAuth();
-  const { tier: currentTier, pendingPayment } = useSubscription();
+  const { tier: currentTier, pendingPayment, subscription } = useSubscription();
+  const hasActivePaid = currentTier !== "free";
   const { data: whatsappNumber } = useWhatsAppNumber();
   const { toast } = useToast();
   const queryClient = useQueryClient();
