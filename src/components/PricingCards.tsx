@@ -17,7 +17,8 @@ interface PricingCardsProps {
 export function PricingCards({ showAction = true }: PricingCardsProps) {
   const { t, language } = useLanguage();
   const { user } = useAuth();
-  const { tier: currentTier, pendingPayment } = useSubscription();
+  const { tier: currentTier, pendingPayment, subscription } = useSubscription();
+  const hasActivePaid = currentTier !== "free";
   const { data: whatsappNumber } = useWhatsAppNumber();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -70,6 +71,16 @@ export function PricingCards({ showAction = true }: PricingCardsProps) {
   const handleSubscribe = (planTier: Tier) => {
     if (!user) { navigate("/signup"); return; }
     if (planTier === "free") return;
+    if (hasActivePaid && currentTier !== planTier) {
+      toast({
+        title: language === "ar" ? "اشتراك نشط" : "Active subscription",
+        description: language === "ar"
+          ? `لديك اشتراك نشط في خطة ${currentTier}. لا يمكنك الاشتراك في خطتين في نفس الوقت.`
+          : `You already have an active ${currentTier} subscription. You cannot subscribe to two tiers at the same time.`,
+        variant: "destructive",
+      });
+      return;
+    }
     if (pendingPayment) {
       toast({
         title: language === "ar" ? "طلب قائم" : "Pending Request",
@@ -136,6 +147,10 @@ export function PricingCards({ showAction = true }: PricingCardsProps) {
                 ) : pendingPayment?.tier === plan.tier ? (
                   <Button className="w-full" variant="outline" disabled>
                     <Clock className="mr-1 h-4 w-4" /> {language === "ar" ? "قيد الانتظار" : "Pending"}
+                  </Button>
+                ) : hasActivePaid ? (
+                  <Button className="w-full" variant="outline" disabled>
+                    {language === "ar" ? "اشتراك آخر نشط" : "Another plan active"}
                   </Button>
                 ) : (
                   <Button
