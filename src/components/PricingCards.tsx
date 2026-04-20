@@ -148,6 +148,10 @@ export function PricingCards({ showAction = true }: PricingCardsProps) {
                   <Button className="w-full" variant="outline" disabled>
                     <Clock className="mr-1 h-4 w-4" /> {language === "ar" ? "قيد الانتظار" : "Pending"}
                   </Button>
+                ) : hasActivePaid ? (
+                  <Button className="w-full" variant="outline" disabled>
+                    {language === "ar" ? "اشتراك آخر نشط" : "Another plan active"}
+                  </Button>
                 ) : (
                   <Button
                     className={`w-full ${plan.popular ? "gold-gradient text-primary-foreground" : "bg-secondary text-foreground hover:bg-secondary/80"}`}
