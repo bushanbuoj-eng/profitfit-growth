@@ -15,9 +15,14 @@ export function AdminWallets() {
   const { data: txs, isLoading } = useQuery({
     queryKey: ["admin-wallet-tx"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("wallet_transactions").select("*, profiles:user_id(email)").order("created_at", { ascending: false });
+      const { data, error } = await supabase.from("wallet_transactions").select("*").order("created_at", { ascending: false });
       if (error) throw error;
-      return data ?? [];
+      const ids = Array.from(new Set((data ?? []).map((t: any) => t.user_id)));
+      const { data: profs } = ids.length
+        ? await supabase.from("profiles").select("id,email").in("id", ids)
+        : { data: [] as any[] };
+      const map = new Map((profs ?? []).map((p: any) => [p.id, p.email]));
+      return (data ?? []).map((t: any) => ({ ...t, profiles: { email: map.get(t.user_id) } }));
     },
   });
 
